@@ -1,4 +1,3 @@
-export const KeyOpenCageData = process.env.KEY_OPENCAGEDATA;
 export const KeyOpenWeatherMap = process.env.KEY_OPENWEATHERAPP;
 
 export async function getWeatherWithLatAndLng(lat:string,lng:string) {
@@ -12,7 +11,8 @@ export async function getWeatherWithLatAndLng(lat:string,lng:string) {
 }
 
 export async function getLatAndLng(cityName:string) {
-    const res = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${cityName}&key=${KeyOpenCageData}&language=en`)
+    const res = await fetch(`
+    http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${KeyOpenWeatherMap}`)
     
     
     if (!res.ok) {
@@ -24,6 +24,8 @@ export async function getLatAndLng(cityName:string) {
   }
 
 export async function getWeather(cityName :string){
-    return await getLatAndLng(cityName)
-    .then(res => getWeatherWithLatAndLng(res?.results[0].geometry?.lat,res?.results[0]?.geometry?.lng));
+    const cityInformations = await getLatAndLng(cityName)
+    const weatherInformations= await getWeatherWithLatAndLng(cityInformations[0].lat,cityInformations[0].lon);
+    
+    return {cityInformations,weatherInformations}
 }
